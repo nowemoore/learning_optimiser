@@ -1,14 +1,15 @@
-from phonemizer import phonemize
 import subprocess
 from wordfreq import word_frequency
 from deep_translator import GoogleTranslator
 import nltk
+from gensim.models.fasttext import load_facebook_model
+from gensim.models import FastText
 
 ## --- ACTUAL FUNCTIONS --- ##
 def init_user_profile(age, l1, l2):
     return {'age': age, 'first_lang': l1, 'other_langs': [l1]+l2}
 
-def get_semantic_embedding(word):
+def get_semantic_embedding(word, target_lang):
     pass
 
 def get_complexity_embedding(word, target_lang, user_profile):
