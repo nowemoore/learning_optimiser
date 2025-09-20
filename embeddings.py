@@ -2,15 +2,17 @@ import subprocess
 from wordfreq import word_frequency
 from deep_translator import GoogleTranslator
 import nltk
-from gensim.models.fasttext import load_facebook_model
-from gensim.models import FastText
+# import gensim.downloader as api
+from sentence_transformers import SentenceTransformer
 
 ## --- ACTUAL FUNCTIONS --- ##
 def init_user_profile(age, l1, l2):
     return {'age': age, 'first_lang': l1, 'other_langs': [l1]+l2}
 
-def get_semantic_embedding(word, target_lang):
-    pass
+def get_semantic_embedding(word, model):
+    ## note to self: figure out fasttext
+    vec = model.encode(word)
+    return vec
 
 def get_complexity_embedding(word, target_lang, user_profile):
     ## create a brand new vector thingy
@@ -160,5 +162,6 @@ def get_levenshtein_score(word1, word2):
     return 1 - nltk.edit_distance(word1, word2) / max(len(word1), len(word2)) # return normalised levenshtein score
 
     
-test_user_profile = init_user_profile(54, "english", ["russian"])
-print(get_complexity_embedding("main", "french", test_user_profile))
+# test_user_profile = init_user_profile(54, "english", ["russian"])
+# print(get_complexity_embedding("main", "french", test_user_profile))
+
