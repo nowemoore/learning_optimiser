@@ -2,14 +2,16 @@ from phonemizer import phonemize
 import subprocess
 from wordfreq import word_frequency
 from deep_translator import GoogleTranslator
+from sentence_transformers import SentenceTransformer
+from sklearn.preprocessing import normalize
 import nltk
 
 ## --- ACTUAL FUNCTIONS --- ##
 def init_user_profile(age, l1, l2):
     return {'age': age, 'first_lang': l1, 'other_langs': [l1]+l2}
 
-def get_semantic_embedding(word):
-    pass
+def get_semantic_embedding(word, model):
+    return model.encode(word).tolist()
 
 def get_complexity_embedding(word, target_lang, user_profile):
     ## create a brand new vector thingy
@@ -40,7 +42,7 @@ def get_complexity_embedding(word, target_lang, user_profile):
     ## similarity to any of the bg langs
     features.append(get_best_levenshtein_score(word, target_lang, user_profile['other_langs']))
     
-    # TO-DO: similarity to other words in lang
+    # TO-DO: similarity to other words in lang (that user probably knows)
 
     return features
 
@@ -159,5 +161,5 @@ def get_levenshtein_score(word1, word2):
     return 1 - nltk.edit_distance(word1, word2) / max(len(word1), len(word2)) # return normalised levenshtein score
 
     
-test_user_profile = init_user_profile(54, "english", ["russian"])
-print(get_complexity_embedding("main", "french", test_user_profile))
+# test_user_profile = init_user_profile(54, "english", ["russian"])
+# print(get_complexity_embedding("main", "french", test_user_profile))
