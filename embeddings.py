@@ -1,19 +1,21 @@
 from phonemizer import phonemize
+import numpy as np
 import subprocess
 from wordfreq import word_frequency
-from deep_translator import GoogleTranslator
 from sentence_transformers import SentenceTransformer
 from sklearn.preprocessing import normalize
 import nltk
 
 ## --- ACTUAL FUNCTIONS --- ##
-def init_user_profile(age, l1, l2):
-    return {'age': age, 'first_lang': l1, 'other_langs': [l1]+l2}
+def user_profile_init(age, target_lang, l1, l2):
+    return {'age': age, 'target_lang': target_lang, 'first_lang': l1, 'other_langs': [l1]+l2}
 
 def get_semantic_embedding(word, model):
     return model.encode(word).tolist()
 
-def get_complexity_embedding(word, target_lang, user_profile):
+def get_complexity_embedding(word, user_profile):
+    target_lang = user_profile['target_lang']
+    
     ## create a brand new vector thingy
     features = []
     
@@ -42,9 +44,13 @@ def get_complexity_embedding(word, target_lang, user_profile):
     ## similarity to any of the bg langs
     features.append(get_best_levenshtein_score(word, target_lang, user_profile['other_langs']))
     
-    # TO-DO: similarity to other words in lang (that user probably knows)
+    ## TO-DO: similarity to other words in lang (that user probably knows)
 
-    return features
+    features = np.array(features)
+    norm = np.linalg.norm(features)
+    if norm == 0:
+        return features
+    return features / norm ## return normalised vector
 
 
 ## --- HELPER FUNCTIONS --- ##
@@ -161,5 +167,8 @@ def get_levenshtein_score(word1, word2):
     return 1 - nltk.edit_distance(word1, word2) / max(len(word1), len(word2)) # return normalised levenshtein score
 
     
-# test_user_profile = init_user_profile(54, "english", ["russian"])
-# print(get_complexity_embedding("main", "french", test_user_profile))
+# test_user_profile = user_profile_init(54, "french", "english", ["russian"])
+# vector = get_complexity_embedding("main", test_user_profile)
+# print(vector)
+# print(np.sum(np.fromiter([i*i for i in vector.astype(float)], float)))
+
