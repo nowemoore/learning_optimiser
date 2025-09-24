@@ -37,16 +37,12 @@ def get_translations(file_name):
     for language in ["fr", "es", "de", "ru", "pl"]:
        df[language] = ""
     
-    idx = 5000   
-    for english_word in df["en"][5000:]:
+    idx = 0
+    for english_word in df["en"]:
         for language in ["fr", "es", "de", "ru", "pl"]:
             df.loc[idx, language] = GoogleTranslator(source="en", target=language).translate(english_word) 
         print(df.iloc[[idx]])  
         idx += 1 
-        if idx % 1 == 0:
+        if idx % 10 == 0:
             df.to_csv("vocab_multiling_final_bit.csv", index=True, encoding='utf-8')
 
-
-df = pd.read_csv('vocab_cleaned.csv', encoding='utf-8', index_col=0)
-df = df.reset_index(drop=True)
-df.to_csv("vocab_final.csv", index=True, encoding='utf-8')
