@@ -1,56 +1,69 @@
 from phonemizer import phonemize
 import numpy as np
+import pandas as pd
 import subprocess
 from wordfreq import word_frequency
 from sentence_transformers import SentenceTransformer
 from sklearn.preprocessing import normalize
 import nltk
 
+## --- PRELOAD FOR FASTER RUNTIME ---
+combined_vocab_df = pd.read_csv('vocab_final.csv', encoding='utf-8', index_col=0)
+
 ## --- ACTUAL FUNCTIONS --- ##
 def user_profile_init(age, target_lang, l1, l2):
     return {'age': age, 'target_lang': target_lang, 'first_lang': l1, 'other_langs': [l1]+l2}
 
-def get_semantic_embedding(word, model):
-    return model.encode(word).tolist()
+def get_semantic_embeddings(word_list, model):
+    embeddings = []
+    for word in word_list:
+        embeddings.append(model.encode(word).tolist())
+    
+    return embeddings
 
-def get_complexity_embedding(word, user_profile):
+def get_complexity_embeddings(word_list, user_profile):
     target_lang = user_profile['target_lang']
+    origin_lang = user_profile['first_lang']  
+    embeddings = []
     
-    ## create a brand new vector thingy
-    features = []
-    
-    ## spelling length
-    features.append(len(word))
-    
-    ## ipa length                   
-    ipa_string = get_ipa_repre(word, target_lang)
-    features.append(len(ipa_string))
-    
-    ## number of syllables
-    IPA_VOWELS = "aeiouɑɐɒæɔəɘɚɛɜɝɞɨɪɯɵøœɶʉʊʌɤʏ"                                    # ~syllable-defining vowels
-    syllable_count = 0                                                              # start counter
-    syllable_count = sum(1 for i, char in enumerate(ipa_string) 
-        if char in IPA_VOWELS and (i == 0 or ipa_string[i-1] not in IPA_VOWELS))    # counts roughly nuclear vowels
-    features.append(syllable_count)
-    
-    ## freq in native lang 
-    origin_lang = user_profile['first_lang']                                                        # access origin lang from profile
-    word_origin_lang_v = GoogleTranslator(source=target_lang, target=origin_lang).translate(word)   # translate target word to origin lang; check supported languages by calling `langs_list = GoogleTranslator().get_supported_languages()`    
-    features.append(get_word_frequency(word_origin_lang_v, origin_lang))                            # find freqency in origin lang
-    
-    ## freq in target lang
-    features.append(get_word_frequency(word, target_lang))
-    
-    ## similarity to any of the bg langs
-    features.append(get_best_levenshtein_score(word, target_lang, user_profile['other_langs']))
-    
-    ## TO-DO: similarity to other words in lang (that user probably knows)
+    for word in word_list:
+        ## create a brand new vector thingy
+        features = []
+        
+        ## spelling length
+        features.append(len(word))
+        
+        ## ipa length                   
+        ipa_string = get_ipa_repre(word, target_lang)
+        features.append(len(ipa_string))
+        
+        ## number of syllables
+        IPA_VOWELS = "aeiouɑɐɒæɔəɘɚɛɜɝɞɨɪɯɵøœɶʉʊʌɤʏ"                                    # ~syllable-defining vowels
+        syllable_count = 0                                                              # start counter
+        syllable_count = sum(1 for i, char in enumerate(ipa_string) 
+            if char in IPA_VOWELS and (i == 0 or ipa_string[i-1] not in IPA_VOWELS))    # counts roughly nuclear vowels
+        features.append(syllable_count)
+        
+        ## freq in native lang                                                                                      # access origin lang from profile
+        word_origin_lang_v = combined_vocab_df.loc[combined_vocab_df[target_lang] == word, origin_lang].iloc[0]     # translate target word to origin lang; check supported languages by calling `langs_list = GoogleTranslator().get_supported_languages()`    
+        features.append(get_word_frequency(word_origin_lang_v, origin_lang))                                        # find freqency in origin lang
+        
+        ## freq in target lang
+        features.append(get_word_frequency(word, target_lang))
+        
+        ## similarity to any of the bg langs
+        features.append(get_best_levenshtein_score(word, target_lang, user_profile['other_langs']))
+        
+        ## TO-DO: similarity to other words in lang (that user probably knows)
 
-    features = np.array(features)
-    norm = np.linalg.norm(features)
-    if norm == 0:
-        return features
-    return features / norm ## return normalised vector
+        features = np.array(features)
+        norm = np.linalg.norm(features)
+        if norm == 0:
+            embeddings.append(features)
+        else:
+            embeddings.append(features / norm) ## append normalised vector
+            
+    return embeddings
 
 
 ## --- HELPER FUNCTIONS --- ##
@@ -154,7 +167,7 @@ def get_best_levenshtein_score(word, target_lang, all_langs):
     
     for lang in all_langs:
         ## get ipa repre of word in bg lang
-        word_bg_lang = GoogleTranslator(source=target_lang, target=lang).translate(word)
+        word_bg_lang = combined_vocab_df.loc[combined_vocab_df[target_lang] == word, lang].iloc[0] 
         word_bg_lang_ipa = get_ipa_repre(word_bg_lang, lang)
         curr_score = get_levenshtein_score(word_ipa, word_bg_lang_ipa)
 
@@ -165,10 +178,4 @@ def get_best_levenshtein_score(word, target_lang, all_langs):
 
 def get_levenshtein_score(word1, word2):
     return 1 - nltk.edit_distance(word1, word2) / max(len(word1), len(word2)) # return normalised levenshtein score
-
-    
-# test_user_profile = user_profile_init(54, "french", "english", ["russian"])
-# vector = get_complexity_embedding("main", test_user_profile)
-# print(vector)
-# print(np.sum(np.fromiter([i*i for i in vector.astype(float)], float)))
 

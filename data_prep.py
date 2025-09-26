@@ -1,8 +1,10 @@
 from pypdf import PdfReader
 import numpy as np
-import csv
 import pandas as pd
 from deep_translator import GoogleTranslator
+from embeddings import * 
+import nltk
+from sentence_transformers import SentenceTransformer
 
 ## read pdf with words
 def read_pdf(file_name):
@@ -43,6 +45,14 @@ def get_translations(file_name):
             df.loc[idx, language] = GoogleTranslator(source="en", target=language).translate(english_word) 
         print(df.iloc[[idx]])  
         idx += 1 
-        if idx % 10 == 0:
-            df.to_csv("vocab_multiling_final_bit.csv", index=True, encoding='utf-8')
+        if idx % 10 == 0: ## save every 10 to prevent losses to dc
+            df.to_csv("vocab_intermed.csv", index=True, encoding='utf-8')
 
+    df.to_csv("vocab_final.csv", index=True, encoding='utf-8')
+    
+def get_embeddings(file_name):
+    df = pd.read_csv(file_name, encoding='utf-8', index_col=0)
+    model = SentenceTransformer("distiluse-base-multilingual-cased-v1")    
+    
+    for language in ["en","fr", "es", "de", "ru", "pl"]:
+        df[f"{language}_embedding"] = df.get  
