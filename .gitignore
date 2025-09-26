@@ -1,3 +1,7 @@
 *.vec
 *.bin
+*.csv
 crawl-300d-2M.vec
+vocab_final_extra_copy.csv
+vocab_final.csv
+vocab_with_embeddings.csv

@@ -51,8 +51,17 @@ def get_translations(file_name):
     df.to_csv("vocab_final.csv", index=True, encoding='utf-8')
     
 def get_embeddings(file_name):
-    df = pd.read_csv(file_name, encoding='utf-8', index_col=0)
+    df = pd.read_csv(file_name, encoding='utf-8', index_col=0, keep_default_na=False)
     model = SentenceTransformer("distiluse-base-multilingual-cased-v1")    
     
-    for language in ["en","fr", "es", "de", "ru", "pl"]:
-        df[f"{language}_embedding"] = df.get  
+    for language in ["de", "ru", "pl"]:
+        lang_col_pos = df.columns.get_loc(language)
+        embeddging_col = get_semantic_embeddings(df[language], model)
+        df.insert(lang_col_pos+1, f"{language}_embedding", embeddging_col)
+        df.to_csv("vocab_with_embeddings_inter.csv")
+        
+    df.to_csv("vocab_with_embeddings.csv")
+        
+get_embeddings("vocab_with_embeddings_inter.csv")
+    
+        

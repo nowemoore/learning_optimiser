@@ -11,13 +11,13 @@ import nltk
 combined_vocab_df = pd.read_csv('vocab_final.csv', encoding='utf-8', index_col=0)
 
 ## --- ACTUAL FUNCTIONS --- ##
-def user_profile_init(age, target_lang, l1, l2):
-    return {'age': age, 'target_lang': target_lang, 'first_lang': l1, 'other_langs': [l1]+l2}
-
 def get_semantic_embeddings(word_list, model):
     embeddings = []
     for word in word_list:
-        embeddings.append(model.encode(word).tolist())
+        print(word)
+        embedding = model.encode(word).tolist()
+        embeddings.append(embedding)
+        print(embedding[:3])
     
     return embeddings
 
