@@ -2,5 +2,5 @@
 
 ```mermaid
 flowchart TD;
-  Slash --> Other[Other Blocks];
+  Embeddings[Embed Vocabulary] --> Other[Other Blocks];
 ```
