@@ -2,5 +2,5 @@
 
 ```architecture
 graph TD;
-start-->end;
+  start-->end;
 ```
