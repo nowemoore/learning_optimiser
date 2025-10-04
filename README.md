@@ -1,6 +1,6 @@
 # Learning Optimiser
 
-```architecture
-graph TD;
+```mermaid
+flowchart TD;
   start-->end;
 ```
