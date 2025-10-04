@@ -2,5 +2,5 @@
 
 ```mermaid
 flowchart TD;
-  Embeddings[Embed Vocabulary] --> Other[Other Blocks];
+  Embeddings[Embed Vocabulary] --> Cluster[Cluster Words];
 ```
