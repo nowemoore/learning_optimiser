@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 from deep_translator import GoogleTranslator
 from embeddings import * 
-import nltk
 from sentence_transformers import SentenceTransformer
 
 ## read pdf with words
