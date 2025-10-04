@@ -2,5 +2,6 @@
 
 ```mermaid
 flowchart TD;
-  Embeddings[Embed Vocabulary] --> Cluster[Cluster Words];
+  Embeddings[embed vocabulary] --> Cluster[cluster vocabulary by embedding];
+  Cluster --> Sample[sample items from clusters];
 ```
