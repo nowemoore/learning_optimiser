@@ -46,5 +46,8 @@ flowchart TD;
   Input --> UserEmbed[create user embedding];
   Embeddings -.-> Combine[combine embeddings];
   UserEmbed --> Combine;
-  Combine --> Predict[predict learning complexity of remaining items];
+  Combine -- for small user # --> Reg[train regression model];
+  Combine -- for large user # --> NN[train neural network];
+  Reg --> Predict[predict learning complexity of all items];
+  NN --> Predict
 ```

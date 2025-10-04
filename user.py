@@ -18,7 +18,7 @@ class Learner:
     def __str__(self):
         return "Learner(ID: %s, Age: %s, Target Language: %s, Primary Language: %s, Other Languages: %s)" % (self.id, self.age, self.target_lang, self.primary_lang, self.all_langs)
     
-
+    
     
         
     
