@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+import random
+from itertools import combinations
 
 @dataclass
 class Learner:
@@ -7,6 +9,7 @@ class Learner:
     target_lang: str
     primary_lang: str
     all_langs: list
+    seed: int = None
     user_data: list = None
     
     def __init__(self, id: int, age: int, target_lang: str, primary_lang: str, all_langs: list):
@@ -15,11 +18,12 @@ class Learner:
         self.target_lang = target_lang
         self.primary_lang = primary_lang
         self.all_langs = all_langs
+        self.seed = random.randint(0, 10000)
         
     def __str__(self):
         return "Learner(ID: %s, Age: %s, Target Language: %s, Primary Language: %s, Other Languages: %s)" % (self.id, self.age, self.target_lang, self.primary_lang, self.all_langs)
     
-    def assess_user(self, test_words: list):
+    def collect_data(self, test_words: list):
         known_words = []
         unknown_words = []
         
@@ -36,7 +40,7 @@ class Learner:
     
     def set_user_data(self, known_words: list, unknown_words: list):
         knowledge_binary = [(word, 1) for word in known_words] + [(word, 0) for word in unknown_words]
-        user_data = [(input, output) for input, output in knowledge_binary] 
+        user_data = [(input, output) for input, output in combinations(knowledge_binary, 2) if input[0] != output[0]]
         self.user_data = user_data
             
             
