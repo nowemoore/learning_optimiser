@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from itertools import combinations
 
 @dataclass
 class Learner:
@@ -10,6 +9,7 @@ class Learner:
     all_langs: list
     seed: int
     user_data: list = None
+    knowledge_binary: list = None
     
     def __init__(self, id: int, age: int, seed: int, target_lang: str, primary_lang: str, all_langs: list):
         self.id = id
@@ -39,8 +39,7 @@ class Learner:
     
     def set_user_data(self, known_words: list, unknown_words: list):
         knowledge_binary = [(word, 1) for word in known_words] + [(word, 0) for word in unknown_words]
-        user_data = [(input, output) for input, output in combinations(knowledge_binary, 2) if input[0] != output[0]]
-        self.user_data = user_data
+        self.knowledge_binary = knowledge_binary
             
             
         
