@@ -23,7 +23,7 @@ def get_semantic_embeddings(word_list, model):
 
 def get_complexity_embeddings(word_list, user_profile):
     target_lang = user_profile['target_lang']
-    origin_lang = user_profile['first_lang']  
+    origin_lang = user_profile['primary_lang']  
     embeddings = []
     
     for word in word_list:
