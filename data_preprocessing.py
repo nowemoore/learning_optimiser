@@ -61,6 +61,5 @@ def get_embeddings(file_name):
         
     df.to_csv("vocab_with_embeddings.csv")
         
-get_embeddings("vocab_with_embeddings_inter.csv")
     
         
