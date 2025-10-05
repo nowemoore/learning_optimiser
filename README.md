@@ -46,8 +46,14 @@ flowchart TD;
   Input --> UserEmbed[create user embedding];
   Embeddings -.-> Combine[combine embeddings];
   UserEmbed --> Combine;
-  Combine -- for small user # --> Reg[train regression model];
+  Combine -- for small user # --> Reg[train linear regression model];
   Combine -- for large user # --> NN[train neural network];
   Reg --> Predict[predict learning complexity of all items];
   NN --> Predict
 ```
+
+## Present Bottlenecks
+
+### Data
+- user input
+- language data
